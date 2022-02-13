@@ -1,25 +1,20 @@
-async function joinThread(channel, threadName){
+export async function joinThread(channel, threadName): Promise<boolean> {
     console.log(threadName);
     const thread = channel.threads.cache.find(x => x.name == threadName);
-    if(!thread)
-    {
+    if (!thread) {
         console.log(`Thread ${threadName} not found`)
-        return;
+        return false;
     }
-    if (thread.joinable)
-    {
+    if (thread.joinable) {
         await thread.join();
         console.log(`Joined thread ${threadName}`)
+        return true;
     }
+    return false;
 }
 
-async function leaveThread(channel, threadName){
+export async function leaveThread(channel, threadName) {
     const thread = channel.threads.cache.find(x => x.name === threadName);
     await thread.leave();
     console.log(`Left thread ${threadName}`)
-}
-
-module.exports = {
-    joinThread,
-    leaveThread
 }

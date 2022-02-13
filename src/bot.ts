@@ -1,21 +1,22 @@
 require('dotenv').config();
 
+import { parsePoints, Emojis } from './pointsParser';
+import * as commands from './commands';
 const { Client } = require('discord.js');
-const commands = require("./commands.js");
-const { parsePoints, Emojis } = require('./pointsParser.js');
-const client = new Client({intents: [
-    "GUILDS",
-    "GUILD_MESSAGES",
-    "GUILD_MESSAGE_REACTIONS"
-]});
-
-const PREFIX='!';
+const client = new Client({
+    intents: [
+        "GUILDS",
+        "GUILD_MESSAGES",
+        "GUILD_MESSAGE_REACTIONS"
+    ]
+});
+const PREFIX = '!';
 
 //COMMAND PARSING
 client.on('messageCreate', (message) => {
-    if(!message.content.startsWith(PREFIX))
+    if (!message.content.startsWith(PREFIX))
         return;
-    [command, ...args] = message.content.substring(PREFIX.length).split(" ");
+    const [command, ...args] = message.content.substring(PREFIX.length).split(" ");
 
     switch (command) {
         case "joinThread":
@@ -32,9 +33,9 @@ client.on('messageCreate', (message) => {
 //WORDLE ETC. PARSING
 client.on('messageCreate', (message) => {
     console.log(message.content);
-    if(!message.content.startsWith("literalnie.fun") &&  !message.content.startsWith("Wordle"))
+    if (!message.content.startsWith("literalnie.fun") && !message.content.startsWith("Wordle"))
         return;
-    
+
     const [site, points] = parsePoints(message.content);
 
     console.log(message.author.tag, site, points);
