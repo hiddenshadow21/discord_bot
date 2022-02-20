@@ -2,6 +2,9 @@ require('dotenv').config();
 
 import { parsePoints, Emojis } from './pointsParser';
 import * as commands from './commands';
+import { saveResult } from './raven';
+import { Result } from "./Models/Result";
+const fs = require('fs')
 const { Client } = require('discord.js');
 const client = new Client({
     intents: [
@@ -12,21 +15,33 @@ const client = new Client({
 });
 const PREFIX = '!';
 
+process.on('uncaughtException', (err) => {
+    console.log(err);
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled rejection at ', promise, `reason: ${reason}`);
+})
+
 //COMMAND PARSING
 client.on('messageCreate', (message) => {
     if (!message.content.startsWith(PREFIX))
         return;
-    const [command, ...args] = message.content.substring(PREFIX.length).split(" ");
-
-    switch (command) {
-        case "joinThread":
-            commands.joinThread(message.channel, args.join(" "))
-            break;
-        case "leaveThread":
-            commands.leaveThread(message.channel, args.join(" "))
-            break;
-        default:
-            break;
+    try {
+        const [command, ...args] = message.content.substring(PREFIX.length).split(" ");
+        switch (command) {
+            case "joinThread":
+                commands.joinThread(message.channel, args.join(" "))
+                break;
+            case "leaveThread":
+                commands.leaveThread(message.channel, args.join(" "))
+                break;
+            default:
+                break;
+        }
+    }
+    catch (err) {
+        console.log(err);
     }
 })
 
@@ -36,13 +51,33 @@ client.on('messageCreate', (message) => {
     if (!message.content.startsWith("literalnie.fun") && !message.content.startsWith("Wordle"))
         return;
 
-    const [site, points] = parsePoints(message.content);
+    try {
+        const [site, gameNumber, points] = parsePoints(message.content);
 
-    console.log(message.author.tag, site, points);
-    message.react(Emojis[points]);
+        console.log(message.author.tag, site, points);
+        message.react(Emojis[points]);
 
-    //todo: save results in db
-    //saveResult(message.user, site, points);
+        //todo: save results in db
+        const result = new Result(message.author.tag, site, points, gameNumber);
+        saveResult(result)
+            .then(() => {
+                message.react('💾');
+            })
+            .catch((err) => {
+                console.log(err)
+                fs.appendFile('Logs/unsaved.log', JSON.stringify(result) + '\n', err => {
+                    if (err) {
+                        console.error(err)
+                        return
+                    }
+                })
+            });
+
+
+    }
+    catch (err) {
+        console.log(err);
+    }
 });
 
 client.on('ready', (c) => {

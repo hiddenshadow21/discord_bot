@@ -1,4 +1,4 @@
-export function parsePoints(messageContent): [string, number] {
+export function parsePoints(messageContent): [string, number, number] {
     const maxPoints = 7;
     const msgArray = messageContent.split(" ");
     const noGuesses = msgArray[2][0];
@@ -7,7 +7,7 @@ export function parsePoints(messageContent): [string, number] {
     const guessesInt = parseInt(noGuesses);
     if (guessesInt)
         points = maxPoints - guessesInt;
-    return [msgArray[0], points];
+    return [msgArray[0], msgArray[1], points];
 }
 
 export const Emojis = {

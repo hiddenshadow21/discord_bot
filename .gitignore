@@ -132,3 +132,7 @@ dist
 #vs-code
 .vscode/
 
+settings.ts
+*.pfx
+*.crt
+*.key
