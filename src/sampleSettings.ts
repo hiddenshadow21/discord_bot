@@ -1,4 +1,5 @@
 export const settings = {
     RavenUrl: "url",
-    DbName: "db"
+    DbName: "db",
+    adminsTags: ["tags"]
 }

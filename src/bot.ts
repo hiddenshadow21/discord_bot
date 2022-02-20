@@ -25,7 +25,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 //COMMAND PARSING
 client.on('messageCreate', (message) => {
-    if (!message.content.startsWith(PREFIX))
+    if (commands.haveAccess(message) == false && !message.content.startsWith(PREFIX))
         return;
     try {
         const [command, ...args] = message.content.substring(PREFIX.length).split(" ");
@@ -54,7 +54,7 @@ client.on('messageCreate', (message) => {
     try {
         const [site, gameNumber, points] = parsePoints(message.content);
 
-        console.log(message.author.tag, site, points);
+        console.log(message.author.tag, site, gameNumber, points);
         message.react(Emojis[points]);
 
         //todo: save results in db

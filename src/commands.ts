@@ -1,4 +1,11 @@
-export async function joinThread(channel, threadName): Promise<boolean> {
+import { Message, TextChannel } from "discord.js";
+import { settings } from "./settings";
+
+export function haveAccess(message: Message): Boolean {
+    return settings.adminsTags.includes(message.author.tag);
+}
+
+export async function joinThread(channel: TextChannel, threadName: String): Promise<boolean> {
     console.log(threadName);
     const thread = channel.threads.cache.find(x => x.name == threadName);
     if (!thread) {
@@ -13,8 +20,13 @@ export async function joinThread(channel, threadName): Promise<boolean> {
     return false;
 }
 
-export async function leaveThread(channel, threadName) {
+export async function leaveThread(channel: TextChannel, threadName: String) {
     const thread = channel.threads.cache.find(x => x.name === threadName);
-    await thread.leave();
-    console.log(`Left thread ${threadName}`)
+    if (thread) {
+        await thread.leave();
+        console.log(`Left thread ${threadName}`)
+    }
+    else {
+        console.log(`Thread ${threadName} not found`)
+    }
 }
